@@ -82,34 +82,6 @@ print "on_snops = %s" % on_snops
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [
-  'sphinxjp.themes.basicstrap',
-  'sphinx.ext.todo',
-  'sphinx.ext.autosectionlabel'
-]
-
-if 'googleanalytics_id' in locals() and len(googleanalytics_id) > 0:
-  extensions += ['sphinxcontrib.googleanalytics']
-  googleanalytics_enabled = True
-
-eggs_loader = pkgutil.find_loader('sphinxcontrib.spelling')
-found = eggs_loader is not None
-
-if found:
-  extensions += ['sphinxcontrib.spelling']
-  spelling_lang='en_US'
-  spelling_word_list_filename='../wordlist'
-  spelling_show_suggestions=True
-  spelling_ignore_pypi_package_names=False
-  spelling_ignore_wiki_words=True
-  spelling_ignore_acronyms=True
-  spelling_ignore_python_builtins=True
-  spelling_ignore_importable_modules=True
-  spelling_filters=[]
-
-source_parsers = {
-   '.md': 'recommonmark.parser.CommonMarkParser',
-}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
