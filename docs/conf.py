@@ -1,36 +1,79 @@
 # -*- coding: utf-8 -*-
 #
-# Configuration file for the Sphinx documentation builder.
 #
-# This file does only contain a selection of the most common options. For a
-# full list see the documentation:
-# http://www.sphinx-doc.org/en/master/config
-
-# -- Path setup --------------------------------------------------------------
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
+# BEGIN CONFIG
+# ------------
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
-#import sphinx_rtd_theme
+# REQUIRED: Your class/lab name
+classname = "Getting Started with F5 BIG-IP"
+
+# OPTIONAL: The URL to the GitHub Repository for this class
+github_repo = "https://github.com/f5devcentral/your-class-repo"
+
+# OPTIONAL: Google Analytics
+# googleanalytics_id = 'UA-85156643-4'
+
+#
+# END CONFIG
+# ----------
+
+import os
+import sys
+import time
+import re
+import pkgutil
+import string
+sys.path.insert(0, os.path.abspath('.'))
 import f5_sphinx_theme
 
-# -- Project information -----------------------------------------------------
+year = time.strftime("%Y")
+eventname = "Agility %s Hands-on Lab Guide" % (year)
 
-project = 'puppet-agility'
-copyright = '2018, Eric Ji'
-author = 'Eric Ji'
+rst_prolog = """
+.. |classname| replace:: %s
+.. |classbold| replace:: **%s**
+.. |classitalic| replace:: *%s*
+.. |ltm| replace:: Local Traffic Manager
+.. |adc| replace:: Application Delivery Controller
+.. |gtm| replace:: Global Traffic Manager
+.. |dns| replace:: DNS
+.. |asm| replace:: Application Security Manager
+.. |afm| replace:: Advanced Firewall Manager
+.. |apm| replace:: Access Policy Manager
+.. |pem| replace:: Policy Enforcement Manager
+.. |ipi| replace:: IP Intelligence
+.. |iwf| replace:: iWorkflow
+.. |biq| replace:: BIG-IQ
+.. |bip| replace:: BIG-IP
+.. |aiq| replace:: APP-IQ
+.. |ve|  replace:: Virtual Edition
+.. |icr| replace:: iControl REST API
+.. |ics| replace:: iControl SOAP API
+.. |f5|  replace:: F5 Networks
+.. |f5i| replace:: F5 Networks, Inc.
+.. |year| replace:: %s
+""" % (classname,
+       classname,
+       classname,
+       year)
 
-# The short X.Y version
-version = ''
-# The full version, including alpha/beta/rc tags
-release = '1.0'
+if 'github_repo' in locals() and len(github_repo) > 0:
+    rst_prolog += """
+.. |repoinfo| replace:: The content contained here leverages a full DevOps CI/CD
+              pipeline and is sourced from the GitHub repository at %s.
+              Bugs and Requests for enhancements can be made using by
+              opening an Issue within the repository.
+""" % (github_repo)
+else:
+    rst_prolog += ".. |repoinfo| replace:: \ \n"
 
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+on_snops = os.environ.get('SNOPS_ISALIVE', None) == 'True'
 
-# -- General configuration ---------------------------------------------------
+print "on_rtd = %s" % on_rtd
+print "on_snops = %s" % on_snops
+
+# -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
@@ -40,7 +83,33 @@ release = '1.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+  'sphinxjp.themes.basicstrap',
+  'sphinx.ext.todo',
+  'sphinx.ext.autosectionlabel'
 ]
+
+if 'googleanalytics_id' in locals() and len(googleanalytics_id) > 0:
+  extensions += ['sphinxcontrib.googleanalytics']
+  googleanalytics_enabled = True
+
+eggs_loader = pkgutil.find_loader('sphinxcontrib.spelling')
+found = eggs_loader is not None
+
+if found:
+  extensions += ['sphinxcontrib.spelling']
+  spelling_lang='en_US'
+  spelling_word_list_filename='../wordlist'
+  spelling_show_suggestions=True
+  spelling_ignore_pypi_package_names=False
+  spelling_ignore_wiki_words=True
+  spelling_ignore_acronyms=True
+  spelling_ignore_python_builtins=True
+  spelling_ignore_importable_modules=True
+  spelling_filters=[]
+
+source_parsers = {
+   '.md': 'recommonmark.parser.CommonMarkParser',
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -48,11 +117,24 @@ templates_path = ['_templates']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
 
 # The master toctree document.
 master_doc = 'index'
+
+# General information about the project.
+project = classname
+copyright = u'2017, F5 Networks, Inc.'
+author = u'F5 Networks, Inc.'
+
+# The version info for the project you're documenting, acts as replacement for
+# |version| and |release|, also used in various other places throughout the
+# built documents.
+#
+# The short X.Y version.
+version = u''
+# The full version, including alpha/beta/rc tags.
+release = u''
 
 # The language for content autogenerated by Sphinx. Refer to documentation
 # for a list of supported languages.
@@ -63,20 +145,20 @@ language = None
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path .
+# This patterns also effect to html_static_path and html_extra_path
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
+# If true, `todo` and `todoList` produce output, else they produce nothing.
+todo_emit_warnings = True
+todo_include_todos = True
 
-# -- Options for HTML output ---------------------------------------------------
+# -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#html_theme = 'default'
-#html_theme = "sphinx_rtd_theme"
-#html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 html_theme = 'f5_sphinx_theme'
 html_theme_path = f5_sphinx_theme.get_html_theme_path()
@@ -86,134 +168,94 @@ html_theme_options = {
                         'next_prev_link': True
                      }
 
+def setup(app):
+    app.add_stylesheet('css/f5_agility_theme.css')
+
+if on_rtd:
+    templates_path = ['_templates']
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
-
-# Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
-
-# The name for this set of Sphinx documents.  If None, it defaults to
-# "<project> v<release> documentation".
-#html_title = None
-
-# A shorter title for the navigation bar.  Default is the same as html_title.
-#html_short_title = None
-
-# The name of an image file (relative to this directory) to place at the top
-# of the sidebar.
-#html_logo = None
-
-# The name of an image file (within the static path) to use as favicon of the
-# docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
-# pixels large.
-#html_favicon = None
+#
+# html_theme_options = {}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-# If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
-# using the given strftime format.
-#html_last_updated_fmt = '%b %d, %Y'
 
-# If true, SmartyPants will be used to convert quotes and dashes to
-# typographically correct entities.
-#html_use_smartypants = True
+# -- Options for HTMLHelp output ------------------------------------------
 
-# Custom sidebar templates, maps document names to template names.
-#html_sidebars = {}
-
-# Additional templates that should be rendered to pages, maps page names to
-# template names.
-#html_additional_pages = {}
-
-# If false, no module index is generated.
-#html_domain_indices = True
-
-# If false, no index is generated.
-#html_use_index = True
-
-# If true, the index is split into individual pages for each letter.
-#html_split_index = False
-
-# If true, links to the reST sources are added to the pages.
-#html_show_sourcelink = True
-
-# If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
-#html_show_sphinx = True
-
-# If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
-#html_show_copyright = True
-
-# If true, an OpenSearch description file will be output, and all pages will
-# contain a <link> tag referring to it.  The value of this option must be the
-# base URL from which the finished HTML is served.
-#html_use_opensearch = ''
-
-# This is the file name suffix for HTML files (e.g. ".xhtml").
-#html_file_suffix = None
+cleanname = re.sub('\W+','',classname)
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Dontbeafraidtocommitdoc'
+htmlhelp_basename =  cleanname + 'doc'
 
+# -- Options for LaTeX output ---------------------------------------------
 
+front_cover_image = 'front_cover'
+back_cover_image = 'back_cover'
 
-# -- Options for HTMLHelp output ---------------------------------------------
+front_cover_image_path = os.path.join('_static', front_cover_image + '.png')
+back_cover_image_path = os.path.join('_static', back_cover_image + '.png')
 
-# Output file base name for HTML help builder.
-htmlhelp_basename = 'puppet-agilitydoc'
+latex_additional_files = [front_cover_image_path, back_cover_image_path]
 
+template = string.Template(open('preamble.tex').read())
 
-# -- Options for LaTeX output ------------------------------------------------
+latex_contents = r"""
+\frontcoverpage
+\contentspage
+"""
+
+backcover_latex_contents = r"""
+\backcoverpage
+"""
 
 latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
+    'papersize': 'letterpaper',
+    'pointsize': '10pt',
+    'fncychap': r'\usepackage[Bjornstrup]{fncychap}',
+    'preamble': template.substitute(eventname=eventname,
+                                    project=project,
+                                    author=author,
+                                    frontcoverimage=front_cover_image,
+                                    backcoverimage=back_cover_image),
 
-    # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
-
-    # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
-
-    # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
+    'tableofcontents': latex_contents,
+    'printindex': backcover_latex_contents
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'puppet-agility.tex', 'puppet-agility Documentation',
-     'Eric Ji', 'manual'),
+    (master_doc, '%s.tex' % cleanname, u'%s Documentation' % classname,
+     u'F5 Networks, Inc.', 'manual', True),
 ]
 
-
-# -- Options for manual page output ------------------------------------------
+# -- Options for manual page output ---------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'puppet-agility', 'puppet-agility Documentation',
+    (master_doc, cleanname.lower(), u'%s Documentation' % classname,
      [author], 1)
 ]
 
 
-# -- Options for Texinfo output ----------------------------------------------
+# -- Options for Texinfo output -------------------------------------------
 
 # Grouping the document tree into Texinfo files. List of tuples
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'puppet-agility', 'puppet-agility Documentation',
-     author, 'puppet-agility', 'One line description of project.',
-     'Miscellaneous'),
+    (master_doc, classname, u'%s Documentation' % classname,
+     author, classname, classname,
+     'Training'),
 ]
+
+
+
